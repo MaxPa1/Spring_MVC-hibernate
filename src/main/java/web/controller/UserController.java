@@ -1,25 +1,25 @@
 package web.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import web.model.User;
 import web.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
-public class MyController {
+public class UserController {
 
     private final UserService userService;
 
-    public MyController(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -45,12 +45,15 @@ public class MyController {
     }
 
     @PostMapping("/saveUser")
-    public String saveUser(@ModelAttribute("user") User user) {
+    public String saveUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "info-user";
+        }
         userService.saveOrUpdateUser(user);
         return "redirect:/";
     }
 
-    @RequestMapping("/deleteUser")
+    @PostMapping("/deleteUser")
     public String deleteUser(@RequestParam(value = "id",required = false) Long id) {
         userService.deleteUserById(id);
         return "redirect:/";
